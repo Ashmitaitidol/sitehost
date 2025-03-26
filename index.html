@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+</head>
+<body>
+
+	<center>
+		<form>
+			<table border="1" width="75%">
+				<thead>
+					<tr>
+						<th>DATE</th>
+						<th>Start Time</th>
+						<th>End Time</th>
+						<th>Total Duration</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td align="center"><label id="currentdate"></label></td>
+						<td align="center"><input type="text" name="" id="starttime1"></td>
+						<td align="center"><input type="text" name="" id="endtime1"></td>
+						<td align="center"><label id="duration1"></label></td>
+					</tr>
+					<tr>
+						<td colspan="4" align="center">&nbsp;</td>
+					</tr>
+					<tr>
+						<td></td>
+						<td align="center"><input type="text" name="" id="starttime2"></td>
+						<td align="center"><input type="text" name="" id="endtime2"></td>
+						<td align="center"><label id="duration2"></label></td>
+					</tr>
+					<tr>
+						<td colspan="4" align="center">&nbsp;</td>
+					</tr>
+					<tr id="totalTr">
+						<td colspan="3" align="center">Total time spent</td>
+						<td align="center"><label id="timeduration"></label></td>
+					</tr>
+				</tbody>
+			</table>
+		</form>
+	</center>
+
+<script src="https://code.jquery.com/jquery-3.6.0.js" integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.3/moment.min.js"  crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script type="text/javascript">
+	var cdate = new Date();
+	$(document).ready(function(){
+		
+		$("#currentdate").text(cdate.getFullYear()+'-'+(parseInt(cdate.getMonth())+1)+'-'+cdate.getDate());
+
+		if(localStorage.getItem('starttime1')){
+			$("#starttime1").val(localStorage.getItem('starttime1'));
+		}
+
+		if(localStorage.getItem('endtime1')){
+			$("#endtime1").val(localStorage.getItem('endtime1'));
+		}
+
+		if(localStorage.getItem('starttime2')){
+			$("#starttime2").val(localStorage.getItem('starttime2'));
+		}
+	});
+
+	function getHourDifference(startDate, endDate)
+	{
+	    var date_future= new Date(endDate);
+	    var date_now= new Date(startDate);
+
+	    var seconds = Math.floor((date_future - (date_now))/1000);
+	    var minutes = Math.floor(seconds/60);
+	    var hours = Math.floor(minutes/60);
+	    var days = Math.floor(hours/24);
+	    
+	    hours = hours-(days*24);
+	    minutes = minutes-(days*24*60)-(hours*60);
+	    seconds = seconds-(days*24*60*60)-(hours*60*60)-(minutes*60);
+
+	    var hours1 = (hours < 10) ? "0"+hours : hours; 
+	    var minutes1 = (minutes < 10) ? "0"+minutes : minutes;
+	    var seconds1 = (seconds < 10) ? "0"+seconds : seconds; 
+	    
+	    // console.log('difference',hours1+":"+minutes1+":"+seconds1);
+	    // console.log('difference',startDate);
+	    return hours1+":"+minutes1+":"+seconds1;
+	    
+  }
+
+
+  function sumofTime(){
+		var time1 = $("#duration1").text();
+        var time2 = $("#duration2").text();
+        
+        var hour=0;
+        var minute=0;
+        var second=0;
+        
+        var splitTime1= time1.split(':');
+        var splitTime2= time2.split(':');
+        
+        hour = parseInt(splitTime1[0])+parseInt(splitTime2[0]);
+        minute = parseInt(splitTime1[1])+parseInt(splitTime2[1]);
+        hour = hour + minute/60;
+        minute = minute%60;
+        second = parseInt(splitTime1[2])+parseInt(splitTime2[2]);
+        minute = minute + second/60;
+        second = second%60;
+        
+        $("#timeduration").text(parseInt(hour)+':'+parseInt(minute)+':'+parseInt(second));
+
+        if(parseInt(hour)>=8 && parseInt(minute)>=30){
+        	$("#totalTr").attr('style','background: red;color: white;');
+        }else{
+        	$("#totalTr").removeAttr('style');
+        }
+	}
+
+	var timeenry = {}
+
+	$("#starttime1").on('input',function(){
+		localStorage.setItem('starttime1',$(this).val());
+	});
+
+	$("#endtime1").on('input',function(){
+		localStorage.setItem('endtime1',$(this).val());
+	});
+
+	$("#starttime2").on('input',function(){
+		localStorage.setItem('starttime2',$(this).val());
+	});
+
+	setInterval(function(){
+		var tdate = moment(cdate, 'YYYY-MM-DD').format('YYYY-MM-DD');
+		var stime1 = $('#starttime1').val()+':00';
+		var etime2 = $("#endtime1").val()+":00";
+
+		var startDate1 = tdate+" "+stime1;
+      	var endDate1 = tdate+" "+etime2;
+      	var difference1 = getHourDifference(startDate1,endDate1);
+
+      	$("#duration1").text(difference1);
+
+      	var cdate1 = new Date();
+
+      	$("#endtime2").val(cdate1.getHours()+':'+cdate1.getMinutes()+":"+cdate1.getSeconds());
+
+      	var stime12 = $('#starttime2').val()+':00';
+		var etime22 = $("#endtime2").val()+":00";
+
+		var startDate12 = tdate+" "+stime12;
+      	var endDate12 = tdate+" "+etime22;
+      	var difference2 = getHourDifference(startDate12,endDate12);
+
+      	$("#duration2").text(difference2);
+
+      	sumofTime()
+      	console.log('')
+
+	},1000);
+
+	
+	
+
+
+</script>
+</body>
+</html>
